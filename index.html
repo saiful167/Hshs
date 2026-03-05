@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Saiful Pro Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-bold mb-4">ফাইল আপলোড করুন</h2>
+        <input type="file" id="fileInput" class="w-full p-2 border rounded mb-4">
+        <button onclick="uploadFile()" class="w-full bg-blue-600 text-white p-3 rounded font-bold">চেক শুরু করুন</button>
+        <div id="status" class="mt-4 text-sm text-gray-600"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const file = document.getElementById('fileInput').files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                const numbers = e.target.result.split('\n').filter(n => n.trim() !== "");
+                document.getElementById('status').innerText = "প্রসেসিং হচ্ছে...";
+                
+                // পাইথন ব্যাকএন্ডে রিকোয়েস্ট পাঠানো
+                const res = await fetch('/api/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ numbers })
+                });
+                const data = await res.json();
+                console.log("Found Users:", data.results);
+                alert("চেক সম্পন্ন! রেজাল্ট কনসোলে দেখুন।");
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
+
